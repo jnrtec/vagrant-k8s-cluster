@@ -1,90 +1,87 @@
-# vagrant-kubespray-k8s-cluster
-
-## Requisitos Prévios
+## Pré-requisitos
 
 --------
 
-Este laboratório requer os seguintes itens:
+Esse laboratório requer:
 
-Software:
-* **Vagrant**: Versão 2.2.7
-* **Sistema Operacional Linux**: VirtualBox
-* **Sistema Operacional Windows**: VirtualBox
-* **Cliente openssh**
-* **Cliente Git**
+Softwares:
+* **Vagrant**: 2.2.7
+* **Linux:** VirtualBox
+* **Windows:** VirtualBox
+* **openssh client**
+* **Git Client**
 
-Hardware:
-* **Processador (CPU)**: Mínimo 6 núcleos
-* **Memória RAM**: Mínimo 8GB
-* **Espaço em Disco**: Mínimo 120GB
+Hardware
+* **CPU:** 6
+* **Memória:** 8GB
+* **HD:** 120GB
 
-> **Nota:** O espaço em disco é ajustável, podendo ser reduzido modificando o arquivo Vagrantfile.
+>**Obs.:** O Disco é flexivel sendo possível diminuir alterando o Vagrantfile
 
-## Preparação da Infraestrutura
+## Preparando a infraestrutura
 
 ---------
 
-1. Acesse um dos links abaixo para baixar o Vagrant:
+1. Acesse o link abaixo:
 
 * https://www.vagrantup.com/downloads.html
 
 * https://releases.hashicorp.com/vagrant/2.2.7/
 
-2. Faça o download do Vagrant para o seu sistema operacional.
-3. Realize a instalação seguindo as instruções abaixo:
+2. Faça o download do Vagrant para seu sistema operacional
+3. Realize a instalação
+* Debian-Based:
+  * dpkg -i <file.deb>
+* RedHat-Based:
+  * rpm -ivh <file.rpm>
+* Windows:
+  *  Clique no instalador
+  *  Siga o assistente até o finalizar a instalação
+  *  Reinicie o computador
 
-* Para sistemas baseados em Debian:
-  * Execute o comando: `dpkg -i <arquivo.deb>`
-* Para sistemas baseados em RedHat:
-  * Execute o comando: `rpm -ivh <arquivo.rpm>`
-* Para sistemas Windows:
-  * Execute o instalador e siga as instruções até concluir a instalação.
-  * Reinicie o computador, se necessário.
 
-## Download do CentOS 7
+## Download do Centos 7
 
 ------------
 
-Para baixar a imagem "box" do CentOS 7, utilize o seguinte comando:
+Para realizar o download da "box" do Centos 7, execute o comando:
 
-#### No Linux
+#### Linux
 ```bash
 $ vagrant box add centos/7
 $ vagrant plugin install scp-vagrant
 ```
 
-#### No Windows
+#### Windows
 ```powershell
 PS> vagrant.exe box add centos/7
 PS> vagrant.exe plugin install scp-vagrant
 ```
-> **Observação:** *Certifique-se de selecionar o virtualizador VirtualBox durante o processo.*
+>**Obs.:** *Selecione o virtualizador virtualbox.*
 
-> **Atenção:** Este laboratório requer o uso do VirtualBox.
+>**Atenção:** Esse laboratório só funciona com o Virtualbox.
 
-## Geração de Chaves SSH
+## Criando chaves SSH
 
-Execute os comandos abaixo para gerar as chaves SSH necessárias:
+Execute os comando abaixo:
 
-#### No Linux
+#### Linux
 
 ```
 $ ssh-keygen -f files/id_rsa
 ```
 
-#### No Windows
+#### Windows
 ```powershell
 PS> ssh-keygen.exe -f files/id_rsa
 ```
 
-#### Inicialização das Máquinas Virtuais
-
-#### No Linux
+#### Linux
 ```bash
 $ vagrant up
 ```
 
-#### No Windows
+#### Windows
 ```powershell
 PS> vagrant.exe up
 ```
@@ -92,66 +89,67 @@ PS> vagrant.exe up
 
 ## O Projeto
 
-Este projeto consiste em quatro máquinas virtuais:
+Esse projeto quatro maquinas virtuais: 
 
-* Controlador **[172.25.10.10]**
-* Kubemaster01 **[172.25.10.20]**
-* Node01 **[172.25.10.30]**
-* Node02 **[172.5.10.40]**
+* controller **[192.168.15.10]**
+* kubemaster01 **[192.168.15.20]**
+* node01 **[192.168.15.30]**
+* node02 **[172.5.10.40]**
 
->O endereço do balanceador de carga é: **[172.25.10.50]**
+>O endereço do loadbalance é: **[192.168.15.50]**
 
-#### Controlador
+#### Controller
 
-Esta máquina virtual é responsável pela instalação e gestão do cluster Kubernetes. Ela inclui os seguintes utilitários:
+Essa máquina virtual é responsável por instalar e gerenciar o cluster kubernetes. Ela possui os seguintes utilitários:
 
 * Ansible
 * Docker
-* Cliente Helm
+* Helm Client
 * Kubectl
-* Registro Docker
+* Docker Registry
 
-Além disso, ela atua como um gerenciador de instalação, realizando as seguintes configurações:
+Ela também é utilizada como um gerenciador de instalação. As configurações executadas por ela são:
 
-* Instalação do cluster Kubernetes via Kubespray. **(Ansible)**
-* Implementação de um balanceador de carga para o Kubernetes. **(Ansible)**
-* Instalação do controlador de ingresso. **(Helm)**
-* Configuração de um serviço de registro Docker. **(Ansible)**
-* Armazenamento de imagens de projetos. **(Registro Docker)**
+* Instalação do cluster Kubernetes através do kubespray. **(Ansible)**
+* Instalação de um loadbalance para o k8s. **(Ansible)**
+* Instalação do ingress controller. **(Helm)**
+* Instalação de um serviço de docker registry. **(Ansible)**
+* Armazenar imagens dos projetos. **(Docker Registry)**
+
 
 #### Kubemaster01
 
-Esta máquina virtual desempenha o papel de nó mestre do cluster Kubernetes. Ela orquestra o cluster e armazena o banco de dados etcd.
+Essa maquina virtual faz o papel de master do cluster kubernetes. Ela faz a orquestração do cluster e armazena o banco de dados etcd.
 
 #### Node01 e Node02
 
-Essas máquinas virtuais executam nossos workloads, atuando como nós do cluster.
+Essas são as máquinas virtuais onde são executados nossos workloads. Fazem o papel de nó do cluster.
 
-## Após a Instalação
+## Após a instalação
 
-#### Comandos Úteis:
+#### Comandos úteis:
 
-Para acessar o controlador:
+Acessando o controlador:
 ```
 vagrant ssh controller
 ```
 
-Para verificar o cluster Kubernetes:
+Varificando o cluster k8s:
 ```
 kubectl get nodes
 ```
 
-O projeto inicia um serviço nginx para testar a instalação do cluster. Para verificar, acesse o seguinte endereço:
+O projeto sobe um serviço do nginx com o objetivo de testar se a instalação do cluster foi bem sucedida. Para verificar, acesse o endereço:
 
-http://nginx.172.25.10.50.nip.io/
+http://nginx.192.168.15.50.nip.io/
 
-Veja as configurações deste workload:
+Veja as configurações desse workload:
 
 ```
 kubectl get all
 kubectl get ingress
 ```
-Abaixo está o resultado esperado:
+Abaixo o resultado esperado:
 ```
 [vagrant@controller ~]$ kubectl get all
 NAME                         READY   STATUS    RESTARTS   AGE
@@ -169,6 +167,6 @@ replicaset.apps/nginx-6799fc88d8   1         1         1       5m57s
 [vagrant@controller ~]$ kubectl get ingress
 Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
 NAME            CLASS    HOSTS                       ADDRESS        PORTS   AGE
-ingress-nginx   <none>   nginx.172.25.10.50.nip.io   172.25.10.50   80      6m7s
+ingress-nginx   <none>   nginx.192.168.15.50.nip.io   192.168.15.50   80      6m7s
 ```
-Se você alcançou este ponto, é um bom sinal. O laboratório está pronto para ser utilizado. :)
+Se você chegou até aqui é um bom sinal. Estamos prontos para utilizar nosso laboratório. :)
