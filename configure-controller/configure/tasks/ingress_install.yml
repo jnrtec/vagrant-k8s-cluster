@@ -3,8 +3,6 @@
   community.kubernetes.helm_repository:
     name: nginx-ingress
     repo_url: "https://charts.bitnami.com/bitnami"
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"
 
 - name: Deploy nginx ingress controller
   community.kubernetes.helm:
@@ -13,5 +11,3 @@
     chart_ref: bitnami/nginx-ingress-controller
     release_namespace: kube-system
     create_namespace: true
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"

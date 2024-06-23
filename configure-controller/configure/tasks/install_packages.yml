@@ -13,7 +13,6 @@
 
 - name: create docker directory
   file:
-    state: directory
     path: /etc/docker
 
 - name: Deploy Docker daemon.json.
@@ -35,6 +34,5 @@
 
 - name: Inserting a line in .bashrc
   lineinfile:
-    state: present
     path: /home/vagrant/.bashrc
     line: source <(kubectl completion bash)
