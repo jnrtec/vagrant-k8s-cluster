@@ -1,23 +1,14 @@
 ---
-- name: Get stats of a file
-  stat:
-    path: /etc/apk/repositories
-  register: repofile
+- name: Adicionar repositório Kubernetes
+  apt_repository:
+    repo: deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: 'kubernetes'
+  notify: Update apt cache
 
-- name: Add Kubernetes Repo
-  apk_repository:
-    name: kubernetes
-    description: APK Repo Kubernetes
-    url: https://dl-cdn.alpinelinux.org/alpine/edge/community
-    enabled: true
-    mirrors:
-      - https://dl-cdn.alpinelinux.org/alpine
-  when: repofile.stat.exists == false
-
-- name: Add Docker Repo
-  apk_repository:
-    name: docker
-    description: APK Repo Docker
-    url: https://dl-cdn.alpinelinux.org/alpine/latest-stable/community
-    enabled: true
-  when: repofile.stat.exists == false
+- name: Adicionar repositório Docker
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+    filename: 'docker'
+  notify: Update apt cache

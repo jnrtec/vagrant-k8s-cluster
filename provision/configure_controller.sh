@@ -1,19 +1,12 @@
-#!/bin/sh
+#!/bin/bash
+# Configuração do controlador Kubernetes
+# Exemplo: inicializar o kubeadm
+sudo kubeadm init --apiserver-advertise-address=$(hostname -i) --pod-network-cidr=10.244.0.0/16
 
-cd configure-controller
+# Configurar kubectl para o usuário vagrant
+mkdir -p /home/vagrant/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+sudo chown vagrant:vagrant /home/vagrant/.kube/config
 
-# Instalação do Helm
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
-
-# Instalação das dependências do Ansible
-apk update
-apk add py3-pip
-pip3 install -r requirements.txt
-
-# Instalação das coleções do Ansible
-ansible-galaxy collection install -r requirements.yml
-
-# Execução do playbook do Ansible
-ansible-playbook -i inventory.ini configure.yml
+# Aplicar o plugin de rede (exemplo: Flannel)
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml

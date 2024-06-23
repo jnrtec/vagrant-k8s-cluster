@@ -17,9 +17,9 @@ rescue
 end
 
 vms = {
-  'kubemaster01' => {'memory' => '1024', 'cpus' => 1},
-  'node01'       => {'memory' => '512', 'cpus' => 1},
-  'node02'       => {'memory' => '512', 'cpus' => 1}
+  'kubemaster01' => {'memory' => '2048', 'cpus' => 3},
+  'node01'       => {'memory' => '1280', 'cpus' => 1},
+  'node02'       => {'memory' => '1280', 'cpus' => 1}
 }
 
 Vagrant.configure("2") do |config|
@@ -31,14 +31,14 @@ Vagrant.configure("2") do |config|
 
   vms.each do |name, conf|
     config.vm.define "#{name}" do |virtual|
-      virtual.vm.box = "generic/alpine312"
+      virtual.vm.box = "ubuntu/focal64"
       virtual.vm.hostname = "#{name}"
 
       # Remover todas as interfaces de rede NAT
       virtual.vm.networks.clear
 
       # Configurar a interface de rede no modo bridge
-      virtual.vm.network "public_network", bridge: "Realtek Gaming GbE Family Controller", use_dhcp_assigned_default_route: true
+      virtual.vm.network "public_network", bridge: "enp0s3", use_dhcp_assigned_default_route: true
 
       # Configurações de provisionamento
       virtual.vm.provision "file", source: "files/motd", destination: ".motd"
@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
       end
 
       # Ativar a interface de rede dentro da VM
-      virtual.vm.provision "shell", inline: "sudo ip link set eth0 up"
+      virtual.vm.provision "shell", inline: "sudo ip link set enp0s3 up"
 
       # Configurações adicionais de provisionamento
       virtual.vm.provision "shell", path: 'provision/ssh-keys.sh'
@@ -65,14 +65,14 @@ Vagrant.configure("2") do |config|
 
   # Configuração do controlador
   config.vm.define "controller", primary: true do |controller|
-    controller.vm.box = "generic/alpine312"
+    controller.vm.box = "ubuntu/focal64"
     controller.vm.hostname = "controller"
 
     # Remover todas as interfaces de rede NAT
     controller.vm.networks.clear
 
     # Configurar a interface de rede no modo bridge
-    controller.vm.network "public_network", bridge: "Realtek Gaming GbE Family Controller", use_dhcp_assigned_default_route: true
+    controller.vm.network "public_network", bridge: "enp0s3", use_dhcp_assigned_default_route: true
 
     controller.vm.boot_timeout = 900
 
@@ -80,7 +80,22 @@ Vagrant.configure("2") do |config|
     controller.vm.provision "file", source: "files/motd", destination: ".motd"
     controller.vm.provision "file", source: "files", destination: "/home/vagrant/"
     controller.vm.provision "file", source: "configure-controller", destination: "/home/vagrant/"
-    controller.vm.provision "shell", inline: "sudo cp ~vagrant/.motd /etc/motd; sudo apk update; sudo apk add vim python3 git"
+    controller.vm.provision "shell", inline: <<-SHELL
+      sudo cp ~vagrant/.motd /etc/motd
+      sudo apt-get update
+      sudo apt-get install -y apt-transport-https ca-certificates curl
+      sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      sudo apt-get update
+      sudo apt-get install -y kubelet kubeadm kubectl
+      sudo apt-mark hold kubelet kubeadm kubectl
+      sudo apt-get install -y docker.io
+      sudo systemctl enable docker
+      sudo systemctl start docker
+      sudo usermod -aG docker vagrant
+      sudo apt-get install -y python3 python3-pip
+      sudo pip3 install ansible
+    SHELL
 
     controller.vm.provider provider.to_sym do |vb, override|
       vb.name = "controller"
@@ -92,7 +107,7 @@ Vagrant.configure("2") do |config|
     end
 
     # Ativar a interface de rede dentro da VM
-    controller.vm.provision "shell", inline: "sudo ip link set eth0 up"
+    controller.vm.provision "shell", inline: "sudo ip link set enp0s3 up"
 
     # Mais configurações de provisionamento para o controlador
     controller.vm.provision "shell", path: 'provision/ssh-keys.sh'

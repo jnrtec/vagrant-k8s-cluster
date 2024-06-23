@@ -1,15 +1,15 @@
 ---
-# tasks file for configure
-- name: Adicionando repositório
+# Arquivo de tarefas para configuração
+- name: Adicionar repositório
   include_tasks: add_repo.yml
 
-- name: Instalando Pacotes
+- name: Instalar pacotes
   include_tasks: install_packages.yml
 
-- name: Configurando kubeconfig
+- name: Configurar kubeconfig
   include_tasks: configure_kubeconfig.yml
 
-- name: Instalando o metallb
+- name: Instalar o MetalLB
   include_tasks: running_metallb.yml
 
 - name: Instalar e configurar o ingress

@@ -1,38 +1,41 @@
 ---
-- name: Install Kubernetes binaries
-  apk:
-    name: "{{ packages }}"
+- name: Instalar pacotes Kubernetes
+  apt:
+    name: "{{ item }}"
     state: present
-  vars:
-    packages:
-      - kubectl
-      - docker
-      - docker-compose
-      - vim
-      - py3-pip
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+    - docker.io
+    - docker-compose
+    - vim
+    - python3-pip
 
-- name: create docker directory
+- name: Criar diretório Docker
   file:
     path: /etc/docker
+    state: directory
 
-- name: Deploy Docker daemon.json.
+- name: Deploy Docker daemon.json
   copy:
     src: configure/files/daemon.json
     dest: /etc/docker/daemon.json
 
-- name: Make sure docker is running
+- name: Garantir que o Docker está rodando
   service:
     name: docker
     state: started
     enabled: yes
 
-- name: Add the user vagrant in group docker
+- name: Adicionar usuário vagrant ao grupo docker
   user:
     name: vagrant
     groups: docker
     append: yes
 
-- name: Inserting a line in .bashrc
+- name: Inserir linha no .bashrc
   lineinfile:
     path: /home/vagrant/.bashrc
-    line: source <(kubectl completion bash)
+    line: "source <(kubectl completion bash)"
+    create: yes
