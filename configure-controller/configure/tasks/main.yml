@@ -1,16 +1,10 @@
----
-# Arquivo de tarefas para configuração
-- name: Adicionar repositório
-  include_tasks: add_repo.yml
-
-- name: Instalar pacotes
-  include_tasks: install_packages.yml
-
-- name: Configurar kubeconfig
-  include_tasks: configure_kubeconfig.yml
-
-- name: Instalar o MetalLB
-  include_tasks: running_metallb.yml
-
-- name: Instalar e configurar o ingress
-  include_tasks: ingress_install.yml
+- name: Configurar Kubernetes Controller
+  hosts: kubemaster01
+  become: yes
+  tasks:
+    - include_tasks: add_repo.yml
+    - include_tasks: install_packages.yml
+    - include_tasks: configure_kubeconfig.yml
+    - include_tasks: create_dockerregistry.yml
+    - include_tasks: ingress_install.yml
+    - include_tasks: running_metallb.yml

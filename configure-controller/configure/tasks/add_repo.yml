@@ -1,14 +1,4 @@
----
 - name: Adicionar repositório Kubernetes
   apt_repository:
-    repo: deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
     state: present
-    filename: 'kubernetes'
-  notify: Update apt cache
-
-- name: Adicionar repositório Docker
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-    state: present
-    filename: 'docker'
-  notify: Update apt cache

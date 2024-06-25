@@ -1,12 +1,14 @@
 #!/bin/bash
-# Configuração do controlador Kubernetes
-# Exemplo: inicializar o kubeadm
-sudo kubeadm init --apiserver-advertise-address=$(hostname -i) --pod-network-cidr=10.244.0.0/16
 
-# Configurar kubectl para o usuário vagrant
-mkdir -p /home/vagrant/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-sudo chown vagrant:vagrant /home/vagrant/.kube/config
-
-# Aplicar o plugin de rede (exemplo: Flannel)
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# Inicializar o cluster Kubernetes se for o nó mestre
+if [ "$(hostname)" == "kubemaster01" ]; then
+  sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+  
+  # Configurar kubectl para o usuário root
+  mkdir -p /root/.kube
+  sudo cp -i /etc/kubernetes/admin.conf /root/.kube/config
+  sudo chown $(id -u):$(id -g) /root/.kube/config
+  
+  # Instalar a rede de pods (Flannel)
+  kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+fi
