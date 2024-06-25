@@ -1,19 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
-cd configure-controller
-
-# Instalação do Helm
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
-
-# Instalação das dependências do Ansible
-apk update
-apk add py3-pip
-pip3 install -r requirements.txt
-
-# Instalação das coleções do Ansible
-ansible-galaxy collection install -r requirements.yml
-
-# Execução do playbook do Ansible
-ansible-playbook -i inventory.ini configure.yml
+# Inicializar o cluster Kubernetes se for o nó mestre
+if [ "$(hostname)" == "kubemaster01" ]; then
+  sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+  
+  # Configurar kubectl para o usuário root
+  mkdir -p /root/.kube
+  sudo cp -i /etc/kubernetes/admin.conf /root/.kube/config
+  sudo chown $(id -u):$(id -g) /root/.kube/config
+  
+  # Instalar a rede de pods (Flannel)
+  kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+fi

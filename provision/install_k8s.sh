@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
-export ANSIBLE_HOST_KEY_CHECKING=False
+# Adicionar chave GPG do Kubernetes
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-# Configuração de permissões para a chave privada
-chmod 700 /home/vagrant/files/id_rsa
+# Adicionar repositório do Kubernetes
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-cd kubespray
-ansible-playbook --private-key /home/vagrant/files/id_rsa -i inventory/bexs/inventory.ini cluster.yml
+# Atualizar lista de pacotes e instalar Kubernetes
+sudo apt-get update -y
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl

@@ -1,17 +1,13 @@
 ---
-- name: Add nginx ingress chart repo
+- name: Adicionar repositório helm do nginx ingress
   community.kubernetes.helm_repository:
     name: nginx-ingress
     repo_url: "https://charts.bitnami.com/bitnami"
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"
 
-- name: Deploy nginx ingress controller
+- name: Instalar nginx ingress controller
   community.kubernetes.helm:
     name: k8s-nginx-ingress
     kubeconfig: /home/vagrant/.kube/config
     chart_ref: bitnami/nginx-ingress-controller
     release_namespace: kube-system
     create_namespace: true
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"
