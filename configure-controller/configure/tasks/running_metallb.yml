@@ -31,7 +31,7 @@
           - name: default
             protocol: layer2
             addresses:
-            - 192.168.15.50-192.168.15.51
+            - 192.168.16.50-192.168.16.51
 
 - name: Criar segredo para MetalLB
   community.kubernetes.k8s:

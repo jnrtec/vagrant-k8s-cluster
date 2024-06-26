@@ -1,106 +1,109 @@
 ## Pré-requisitos
 
---------
-
 Esse laboratório requer:
 
-Softwares:
+### Softwares:
 * **Vagrant**: 2.2.7
 * **Linux:** VirtualBox
 * **Windows:** VirtualBox
 * **openssh client**
 * **Git Client**
 
-Hardware
+### Hardware:
 * **CPU:** 6
 * **Memória:** 8GB
 * **HD:** 120GB
 
->**Obs.:** O Disco é flexivel sendo possível diminuir alterando o Vagrantfile
+>**Obs.:** O Disco é flexível, sendo possível diminuir alterando o Vagrantfile.
 
 ## Preparando a infraestrutura
 
----------
+1. Acesse o link abaixo para baixar o Vagrant:
 
-1. Acesse o link abaixo:
+   * [Vagrant Downloads](https://www.vagrantup.com/downloads.html)
+   * [Vagrant 2.2.7 Releases](https://releases.hashicorp.com/vagrant/2.2.7/)
 
-* https://www.vagrantup.com/downloads.html
+2. Faça o download do Vagrant para seu sistema operacional.
 
-* https://releases.hashicorp.com/vagrant/2.2.7/
+3. Realize a instalação:
 
-2. Faça o download do Vagrant para seu sistema operacional
-3. Realize a instalação
-* Debian-Based:
-  * dpkg -i <file.deb>
-* RedHat-Based:
-  * rpm -ivh <file.rpm>
-* Windows:
-  *  Clique no instalador
-  *  Siga o assistente até o finalizar a instalação
-  *  Reinicie o computador
+   #### Debian-Based:
+   ```bash
+   dpkg -i <file.deb>
+   ```
 
+   #### RedHat-Based:
+   ```bash
+   rpm -ivh <file.rpm>
+   ```
 
-## Download do Centos 7
+   #### Windows:
+   * Clique no instalador.
+   * Siga o assistente até finalizar a instalação.
+   * Reinicie o computador.
 
-------------
+## Download do Ubuntu
 
-Para realizar o download da "box" do Centos 7, execute o comando:
+Para realizar o download da "box" do Ubuntu, execute o comando:
 
-#### Linux
+#### Linux:
 ```bash
-$ vagrant box add centos/7
+$ vagrant box add ubuntu/focal64
 $ vagrant plugin install scp-vagrant
 ```
 
-#### Windows
+#### Windows:
 ```powershell
-PS> vagrant.exe box add centos/7
+PS> vagrant.exe box add ubuntu/focal64
 PS> vagrant.exe plugin install scp-vagrant
 ```
->**Obs.:** *Selecione o virtualizador virtualbox.*
 
->**Atenção:** Esse laboratório só funciona com o Virtualbox.
+>**Obs.:** Selecione o virtualizador VirtualBox.
+
+>**Atenção:** Esse laboratório só funciona com o VirtualBox.
 
 ## Criando chaves SSH
 
-Execute os comando abaixo:
+Execute os comandos abaixo:
 
-#### Linux
-
-```
+#### Linux:
+```bash
 $ ssh-keygen -f files/id_rsa
 ```
 
-#### Windows
+#### Windows:
 ```powershell
 PS> ssh-keygen.exe -f files/id_rsa
 ```
 
-#### Linux
+## Subindo as Máquinas Virtuais
+
+Para subir as máquinas virtuais, execute os comandos abaixo:
+
+#### Linux:
 ```bash
 $ vagrant up
 ```
 
-#### Windows
+#### Windows:
 ```powershell
 PS> vagrant.exe up
 ```
 
-
 ## O Projeto
 
-Esse projeto quatro maquinas virtuais: 
+Esse projeto cria quatro máquinas virtuais:
 
-* controller **[192.168.15.10]**
-* kubemaster01 **[192.168.15.20]**
-* node01 **[192.168.15.30]**
-* node02 **[172.5.10.40]**
+* **controller**: 192.168.16.10
+* **kubemaster01**: 192.168.16.20
+* **node01**: 192.168.16.30
+* **node02**: 192.168.16.40
 
->O endereço do loadbalance é: **[192.168.15.50]**
+>O endereço do load balancer é: **192.168.16.50**
 
-#### Controller
+### Controller
 
-Essa máquina virtual é responsável por instalar e gerenciar o cluster kubernetes. Ela possui os seguintes utilitários:
+Essa máquina virtual é responsável por instalar e gerenciar o cluster Kubernetes. Ela possui os seguintes utilitários:
 
 * Ansible
 * Docker
@@ -110,47 +113,46 @@ Essa máquina virtual é responsável por instalar e gerenciar o cluster kuberne
 
 Ela também é utilizada como um gerenciador de instalação. As configurações executadas por ela são:
 
-* Instalação do cluster Kubernetes através do kubespray. **(Ansible)**
-* Instalação de um loadbalance para o k8s. **(Ansible)**
-* Instalação do ingress controller. **(Helm)**
-* Instalação de um serviço de docker registry. **(Ansible)**
-* Armazenar imagens dos projetos. **(Docker Registry)**
+* Instalação do cluster Kubernetes através do kubespray (Ansible).
+* Instalação de um load balancer para o k8s (Ansible).
+* Instalação do ingress controller (Helm).
+* Instalação de um serviço de docker registry (Ansible).
+* Armazenar imagens dos projetos (Docker Registry).
 
+### Kubemaster01
 
-#### Kubemaster01
+Essa máquina virtual faz o papel de master do cluster Kubernetes. Ela faz a orquestração do cluster e armazena o banco de dados etcd.
 
-Essa maquina virtual faz o papel de master do cluster kubernetes. Ela faz a orquestração do cluster e armazena o banco de dados etcd.
-
-#### Node01 e Node02
+### Node01 e Node02
 
 Essas são as máquinas virtuais onde são executados nossos workloads. Fazem o papel de nó do cluster.
 
 ## Após a instalação
 
-#### Comandos úteis:
+### Comandos úteis
 
 Acessando o controlador:
-```
+```bash
 vagrant ssh controller
 ```
 
-Varificando o cluster k8s:
-```
+Verificando o cluster k8s:
+```bash
 kubectl get nodes
 ```
 
-O projeto sobe um serviço do nginx com o objetivo de testar se a instalação do cluster foi bem sucedida. Para verificar, acesse o endereço:
+O projeto sobe um serviço do nginx com o objetivo de testar se a instalação do cluster foi bem-sucedida. Para verificar, acesse o endereço:
 
-http://nginx.192.168.15.50.nip.io/
+http://nginx.192.168.16.50.nip.io/
 
 Veja as configurações desse workload:
-
-```
+```bash
 kubectl get all
 kubectl get ingress
 ```
+
 Abaixo o resultado esperado:
-```
+```bash
 [vagrant@controller ~]$ kubectl get all
 NAME                         READY   STATUS    RESTARTS   AGE
 pod/nginx-6799fc88d8-b7r96   1/1     Running   0          5m57s
@@ -167,6 +169,9 @@ replicaset.apps/nginx-6799fc88d8   1         1         1       5m57s
 [vagrant@controller ~]$ kubectl get ingress
 Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
 NAME            CLASS    HOSTS                       ADDRESS        PORTS   AGE
-ingress-nginx   <none>   nginx.192.168.15.50.nip.io   192.168.15.50   80      6m7s
+ingress-nginx   <none>   nginx.192.168.16.50.nip.io   192.168.16.50   80      6m7s
 ```
-Se você chegou até aqui é um bom sinal. Estamos prontos para utilizar nosso laboratório. :)
+
+Se você chegou até aqui, é um bom sinal. Estamos prontos para utilizar nosso laboratório. :)
+
+---
